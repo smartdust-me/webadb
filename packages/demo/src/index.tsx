@@ -6,7 +6,7 @@ import ReactDOM from 'react-dom';
 import { HashRouter, Redirect, useLocation } from 'react-router-dom';
 import { AdbEventLogger, CacheRoute, CacheSwitch, Connect, ErrorDialogProvider, Logger, LoggerContextProvider, ToggleLogger } from './components';
 import './index.css';
-import { DeviceInfo, FileManager, FrameBuffer, Install, Intro, Scrcpy, Shell, TcpIp } from './routes';
+import { DeviceInfo, FileManager, FrameBuffer, Install, Intro, Scrcpy, Shell, TcpIp, ZeroTier } from './routes';
 
 initializeIcons();
 
@@ -111,6 +111,14 @@ function App(): JSX.Element | null {
             noCache: true,
             children: (
                 <Scrcpy device={device} />
+            ),
+        },
+        {
+            path: '/zerotier',
+            name: 'ZeroTier',
+            noCache: true,
+            children: (
+                <ZeroTier device={device} />
             ),
         },
     ], [device]);
