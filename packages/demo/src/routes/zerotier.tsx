@@ -40,7 +40,6 @@ export const ZeroTier = withDisplayName('ZeroTier')(({
     }, [device]);
 
     const handleJoin = useCallback(async () => {
-        setZeroTierIp("");
         setRunning(true);
 
         await device!.exec("am", "start", "-n", "com.zerotier.one/.ui.JoinNetworkActivity");
@@ -71,6 +70,13 @@ export const ZeroTier = withDisplayName('ZeroTier')(({
         await device!.exec("input", "keyevent", "4");
         await delay(2000);
         await device!.exec("am", "start", "-n", "com.zerotier.one/.ui.NetworkListActivity");
+
+        setRunning(false);
+    }, [device]);
+
+    const handleWaitForIp = useCallback(async () => {
+        setZeroTierIp("");
+        setRunning(true);
 
         let ip = "";
         while (ip.length === 0) {
@@ -112,6 +118,7 @@ export const ZeroTier = withDisplayName('ZeroTier')(({
                 </Stack>
             </StackItem>
             <DefaultButton text="Join Network" disabled={!device || running} onClick={handleJoin} />
+            <DefaultButton text="Wait for IP" disabled={!device || running} onClick={handleWaitForIp} />
             <Text>{zeroTierIp}</Text>
             <DefaultButton text="Switch to TCP" disabled={!device || running} onClick={handleTcp} />
         </>
