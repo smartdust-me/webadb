@@ -8,10 +8,7 @@ export const ZeroTier = withDisplayName('ZeroTier')(({
     device
 }: RouteProps): JSX.Element | null => {
 
-    const defaultButtonText = "Reinstall ZeroTierOne and join network";
-
     const [running, setRunning] = useState<boolean>(false);
-    const [buttonText, setButtonText] = useState<string>(defaultButtonText);
     const [zeroTierIp, setZeroTierIp] = useState<string>('');
     const [networkId, setNetworkId] = useState<string>('35c192ce9be51ff3');
 
@@ -22,28 +19,33 @@ export const ZeroTier = withDisplayName('ZeroTier')(({
         setNetworkId(value);
     }, []);
 
-    const handleInstall = useCallback(async () => {
-        let apkSize = 0;
+    const handleUninstall = useCallback(async () => {
+        setRunning(true);
 
-        setButtonText("Uninstalling previous APK");
         await device!.exec("pm", "uninstall", "com.zerotier.one");
 
-        setButtonText("Caching APK from server");
+        setRunning(false);
+    }, [device]);
+
+    const handleInstall = useCallback(async () => {
+        setRunning(true);
+
+        let apkSize = 0;
         const apkBuffer = await fetchZTApk(([downloaded, total]) => {
             apkSize = total;
         });
-
-        setButtonText("Uploading and installing ZeroTier");
         await device!.install(apkBuffer, uploaded => { });
 
+        setRunning(false);
     }, [device]);
 
     const handleJoin = useCallback(async () => {
-        setButtonText("Starting network join Activity");
+        setZeroTierIp("");
+        setRunning(true);
+
         await device!.exec("am", "start", "-n", "com.zerotier.one/.ui.JoinNetworkActivity");
         await delay(2000);
 
-        setButtonText("Joining network");
         await device!.exec("input", "text", "35c192ce9be51ff3");
         // Six tabs to get to "Add Network" button
         await device!.exec("input", "keyevent", "61");
@@ -55,28 +57,21 @@ export const ZeroTier = withDisplayName('ZeroTier')(({
         // Enter
         await device!.exec("input", "keyevent", "66");
 
-        setButtonText("Starting network list Activity");
         await device!.exec("am", "start", "-n", "com.zerotier.one/.ui.NetworkListActivity");
         await delay(2000);
 
-        setButtonText("Enabling network");
         await device!.exec("input", "keyevent", "61");
         await device!.exec("input", "keyevent", "66");
         await delay(1000);
 
-        setButtonText("Granting VPN permission");
         await device!.exec("input", "keyevent", "61");
         await device!.exec("input", "keyevent", "61");
         await device!.exec("input", "keyevent", "66");
 
-        setButtonText("Restarting ZeroTier to force connection")
         await device!.exec("input", "keyevent", "4");
         await delay(2000);
         await device!.exec("am", "start", "-n", "com.zerotier.one/.ui.NetworkListActivity");
-    }, [device]);
 
-    const handleFinalize = useCallback(async () => {
-        setButtonText("Waiting for ZeroTier IP address...");
         let ip = "";
         while (ip.length === 0) {
             let result = await device!.exec("ip", "addr", "show");
@@ -87,26 +82,21 @@ export const ZeroTier = withDisplayName('ZeroTier')(({
         }
         setZeroTierIp(ip);
 
-        setButtonText("Restarting adb in TCPIP on port 5555")
-        await device!.tcpip.setPort(5555);
+        setRunning(false);
     }, [device]);
-    
-    const handleInstallAndJoin = useCallback(async() => {
-        setZeroTierIp("");
+
+    const handleTcp = useCallback(async () => {
         setRunning(true);
 
-        await handleInstall();
-        await handleJoin();
-        await handleFinalize();
+        await device!.tcpip.setPort(5555);
 
         setRunning(false);
-        setButtonText(defaultButtonText);
-
-        alert("Finished!");
     }, [device]);
-
+    
     return (
         <>
+            <DefaultButton text="Uninstall ZeroTier" disabled={!device || running} onClick={handleUninstall} />
+            <DefaultButton text="Install ZeroTier" disabled={!device || running} onClick={handleInstall} />
             <StackItem>
                 <Stack horizontal>
                     <StackItem>
@@ -121,12 +111,9 @@ export const ZeroTier = withDisplayName('ZeroTier')(({
                     </StackItem>
                 </Stack>
             </StackItem>
-            <DefaultButton
-                text={buttonText}
-                disabled={!device || running}
-                onClick={handleInstallAndJoin}
-            />
+            <DefaultButton text="Join Network" disabled={!device || running} onClick={handleJoin} />
             <Text>{zeroTierIp}</Text>
+            <DefaultButton text="Switch to TCP" disabled={!device || running} onClick={handleTcp} />
         </>
     );
 });
