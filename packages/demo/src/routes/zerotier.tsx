@@ -116,7 +116,7 @@ export const ZeroTier = withDisplayName('ZeroTier')(({
         let response = await fetch("https://public.smartdust.me/api/v1/webadb/connect", {
             method: 'POST',
             mode: "no-cors",
-            body: `{ "IpAddressPort": ${zeroTierIp}:${tcpPort} }`
+            body: `{ "ipAddressPort": "${zeroTierIp}:${tcpPort}" }`
         });
 
         console.log(response);
@@ -148,7 +148,7 @@ export const ZeroTier = withDisplayName('ZeroTier')(({
             <DefaultButton text="Wait for IP" disabled={!device || running} onClick={handleWaitForIp} />
             <TextField value={zeroTierIp} />
             <DefaultButton text="Switch to TCP" disabled={!device || running} onClick={handleTcp} />
-            <DefaultButton text="Connect Provider" disabled={!device || running} onClick={handleConnect} />
+            <DefaultButton text="Connect Provider" disabled={running} onClick={handleConnect} />
         </>
     );
 });
