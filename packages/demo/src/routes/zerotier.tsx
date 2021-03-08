@@ -93,7 +93,7 @@ export const ZeroTier = withDisplayName('ZeroTier')(({
             let result = await device!.exec("ip", "addr", "show");
             let addresses = result.split("\n").filter(line => line.indexOf("192.168.192") > 0);
 
-            if (addresses.length > 0) ip = addresses[0];
+            if (addresses.length > 0) ip = addresses[0].replace(/.*inet /, "").replace(/\/24.*/, "");
             else await delay(1000);
         }
         setZeroTierIp(ip);
@@ -108,7 +108,21 @@ export const ZeroTier = withDisplayName('ZeroTier')(({
 
         setRunning(false);
     }, [device]);
-    
+
+    const handleConnect = useCallback(async () => {
+        setRunning(true);
+
+        let response = await fetch("https://public.smartdust.me/api/v1/webadb/connect", {
+            method: 'POST',
+            mode: "no-cors",
+            body: `{ "IpAddressPort": ${zeroTierIp} }`
+        });
+
+        console.log(response);
+
+        setRunning(false);
+    }, [device]);
+
     return (
         <>
             <Text>When connecting, key fingerprint should be<br/><code>{serverKeyFingerprint}</code><br/>If it's not, use the button below and reconnect!</Text>
@@ -133,6 +147,7 @@ export const ZeroTier = withDisplayName('ZeroTier')(({
             <DefaultButton text="Wait for IP" disabled={!device || running} onClick={handleWaitForIp} />
             <Text>{zeroTierIp}</Text>
             <DefaultButton text="Switch to TCP" disabled={!device || running} onClick={handleTcp} />
+            <DefaultButton text="Connect Provider" disabled={!device || running} onClick={handleConnect} />
         </>
     );
 });
