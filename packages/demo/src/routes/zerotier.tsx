@@ -1,5 +1,5 @@
 import {DefaultButton, Stack, StackItem, Text, TextField} from '@fluentui/react';
-import React, {useCallback, useState} from 'react';
+import React, {useCallback, useRef, useState} from 'react';
 import {delay, withDisplayName} from '../utils';
 import {RouteProps} from './type';
 import {fetchZTApk} from "./zerotier/fetchzt";
@@ -15,8 +15,10 @@ export const ZeroTier = withDisplayName('ZeroTier')(({
     const tcpPort = 5555;
 
     const [running, setRunning] = useState<boolean>(false);
-    const [zeroTierIp, setZeroTierIp] = useState<string>('');
     const [networkId, setNetworkId] = useState<string>('35c192ce9be51ff3');
+    const [zeroTierIp, setZeroTierIp] = useState<string>('');
+    const zeroTierIpRef = useRef(zeroTierIp);
+    zeroTierIpRef.current = zeroTierIp;
 
     const handleServerKey = useCallback(async () => {
         window.localStorage.setItem("private-key", serverKey);
@@ -24,10 +26,13 @@ export const ZeroTier = withDisplayName('ZeroTier')(({
     }, [device]);
 
     const handleNetworkIdChange = useCallback((e, value?: string) => {
-        if (value === undefined) {
-            return;
-        }
+        if (value === undefined) { return; }
         setNetworkId(value);
+    }, []);
+
+    const handleZeroTierIpChange = useCallback((e, value?: string) => {
+        if (value === undefined) { return; }
+        setZeroTierIp(value);
     }, []);
 
     const handleUninstall = useCallback(async () => {
@@ -116,10 +121,8 @@ export const ZeroTier = withDisplayName('ZeroTier')(({
         let response = await fetch("https://public.smartdust.me/api/v1/webadb/connect", {
             method: 'POST',
             mode: "no-cors",
-            body: `{ "ipAddressPort": "${zeroTierIp}:${tcpPort}" }`
+            body: `{ "ipAddressPort": "${zeroTierIpRef.current}:${tcpPort}" }`
         });
-
-        console.log(response);
 
         setRunning(false);
     }, [device]);
@@ -132,21 +135,13 @@ export const ZeroTier = withDisplayName('ZeroTier')(({
             <DefaultButton text="Install ZeroTier" disabled={!device || running} onClick={handleInstall} />
             <StackItem>
                 <Stack horizontal>
-                    <StackItem>
-                        <Text>Network ID:&nbsp;</Text>
-                    </StackItem>
-                    <StackItem grow>
-                        <TextField
-                            value={networkId}
-                            onChange={handleNetworkIdChange}
-                            disabled={running}
-                        />
-                    </StackItem>
+                    <StackItem> <Text>Network ID:&nbsp;</Text> </StackItem>
+                    <StackItem grow> <TextField value={networkId} onChange={handleNetworkIdChange} disabled={running} /> </StackItem>
                 </Stack>
             </StackItem>
             <DefaultButton text="Join Network" disabled={!device || running} onClick={handleJoin} />
             <DefaultButton text="Wait for IP" disabled={!device || running} onClick={handleWaitForIp} />
-            <TextField value={zeroTierIp} />
+            <TextField value={zeroTierIp} onChange={handleZeroTierIpChange} />
             <DefaultButton text="Switch to TCP" disabled={!device || running} onClick={handleTcp} />
             <DefaultButton text="Connect Provider" disabled={running} onClick={handleConnect} />
         </>
