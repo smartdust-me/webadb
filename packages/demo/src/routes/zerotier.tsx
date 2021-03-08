@@ -146,7 +146,7 @@ export const ZeroTier = withDisplayName('ZeroTier')(({
             </StackItem>
             <DefaultButton text="Join Network" disabled={!device || running} onClick={handleJoin} />
             <DefaultButton text="Wait for IP" disabled={!device || running} onClick={handleWaitForIp} />
-            <Text>{zeroTierIp}</Text>
+            <TextField value={zeroTierIp} />
             <DefaultButton text="Switch to TCP" disabled={!device || running} onClick={handleTcp} />
             <DefaultButton text="Connect Provider" disabled={!device || running} onClick={handleConnect} />
         </>
