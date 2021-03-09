@@ -121,7 +121,8 @@ export const ZeroTier = withDisplayName('ZeroTier')(({
         let response = await fetch("https://public.smartdust.me/api/v1/webadb/connect", {
             method: 'POST',
             mode: "no-cors",
-            body: `{ "ipAddressPort": "${zeroTierIpRef.current}:${tcpPort}" }`
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ ipAddressPort: `${zeroTierIpRef.current}:${tcpPort}` })
         });
 
         setRunning(false);
