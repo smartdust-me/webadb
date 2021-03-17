@@ -147,12 +147,15 @@ export const ZeroTier = withDisplayName('ZeroTier')(({
             <br />
             <h1>Instructions</h1>
             <table>
-                <tr><th>Step</th><th>Explanation</th><th>Action</th></tr>
+                <tr><th>Step</th><th>Explanation</th></tr>
                 <tr>
-                    <td><b>1. Connecting your device to this page</b></td>
+                    <td>
+                        <p><b>1. Connecting your device to this page</b></p>
+                        <Connect device={device} logger={logger.logger} onDeviceChange={setDevice}/>
+                    </td>
                     <td>
                         <p>
-                            In the box to the right:
+                            In the box to the left:
                             <ul>
                                 <li>Click <b>Add Device</b>, select your device and press <b>connect</b></li>
                                 <li>Click <b>Connect</b></li>
@@ -167,15 +170,21 @@ export const ZeroTier = withDisplayName('ZeroTier')(({
                             </ul>
                         </p>
                     </td>
-                    <td><Connect device={device} logger={logger.logger} onDeviceChange={setDevice}/></td>
                 </tr>
                 <tr>
-                    <td><b>2. Installing VPN app</b></td>
+                    <td>
+                        <p><b>2. Installing VPN app</b></p>
+                        <DefaultButton text="Install VPN app" disabled={!device || running} onClick={handleInstall} />
+                    </td>
                     <td><p>Click <b>Install VPN app</b> and wait until it becomes enabled again, then move to the next step.</p></td>
-                    <td><DefaultButton text="Install VPN app" disabled={!device || running} onClick={handleInstall} /></td>
                 </tr>
                 <tr>
-                    <td><b>3. Joining SmartDust ZeroTier Network</b></td>
+                    <td>
+                        <p><b>3. Joining SmartDust ZeroTier Network</b></p>
+                        <p>Network ID:&nbsp;</p>
+                        <TextField value={networkId} onChange={handleNetworkIdChange} disabled={running} />
+                        <DefaultButton text="Join Network" disabled={!device || running} onClick={handleJoin} />
+                    </td>
                     <td>
                         <p><b>Before you begin:</b>
                             <ul>
@@ -189,28 +198,25 @@ export const ZeroTier = withDisplayName('ZeroTier')(({
                             <p>Click <b>Join Network</b> and wait until it becomes enabled again, then move to the next step.</p>
                         </p>
                     </td>
-                    <td>
-                        <p>Network ID:&nbsp;</p>
-                        <TextField value={networkId} onChange={handleNetworkIdChange} disabled={running} />
-                        <DefaultButton text="Join Network" disabled={!device || running} onClick={handleJoin} />
-                    </td>
                 </tr>
                 <tr>
-                    <td><b>4. Getting the Private Network IP Address</b></td>
-                    <td><p>Click <b>Wait for IP</b> and wait until an IP address shows up in the box to the right.</p></td>
                     <td>
+                        <p><b>4. Getting the Private Network IP Address</b></p>
                         <DefaultButton text="Wait for IP" disabled={!device || running} onClick={handleWaitForIp} />
                         <TextField value={zeroTierIp} onChange={handleZeroTierIpChange} />
                     </td>
+                    <td><p>Click <b>Wait for IP</b> and wait until an IP address shows up in the box to the right.</p></td>
                 </tr>
                 <tr>
-                    <td><b>5. Connecting SmartDust Provider to the device</b></td>
+                    <td>
+                        <p><b>5. Connecting SmartDust Provider to the device</b></p>
+                        <DefaultButton text="Switch to TCP" disabled={!device || running} onClick={handleTcp} />
+                    </td>
                     <td>
                         <p>Click <b>Switch to TCP</b>. Your device will now disconnect from this page, <b>this is normal!</b></p>
                         <p>Copy the IP Address from the previous step into the box at the top of the page and click the <b>Connect</b> button next to it.</p>
                         <p><b>That's it!</b> Your device should now be available in SmartDust!</p>
                     </td>
-                    <td><DefaultButton text="Switch to TCP" disabled={!device || running} onClick={handleTcp} /></td>
                 </tr>
             </table>
 
