@@ -7,3 +7,12 @@ html, body, #container {
 .ms-Dialog-subText {
     white-space: pre-wrap;
 }
+
+table {
+    border-collapse: collapse;
+    width: 100%;
+}
+
+table, td, th {
+    border: 1px solid black;
+}

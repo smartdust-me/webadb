@@ -145,75 +145,87 @@ export const ZeroTier = withDisplayName('ZeroTier')(({
                 <li>If you run into any errors not mentioned in the instruction steps, try looking at <b>Troubleshooting</b> at the end of this page.</li>
             </ul>
             <br />
-
-            <h2>1. Connecting your device to this page</h2>
-            <Text>In the box below:</Text>
-            <ul>
-                <li>Click <b>Add Device</b>, select your device and press <b>connect</b></li>
-                <li>Click <b>Connect</b></li>
-                <li>On your device you should see a dialog with a server key fingerprint. Make sure it's this:</li>
-                <ul>
-                    <li><code>{serverKeyFingerprint}</code></li>
-                </ul>
-                <li><b>If it's different, reload this page and start over!</b></li>
-                <li>If the key matches, check the checkbox and click <b>Allow</b>.</li>
-            </ul>
-            <Connect
-                device={device}
-                logger={logger.logger}
-                onDeviceChange={setDevice}
-            />
-            <br />
-
-            <h2>2. Installing ZeroTier</h2>
-            <Text>Click <b>Install ZeroTier</b> and wait until it becomes enabled again, then move to the next step.</Text>
-            <DefaultButton text="Install ZeroTier" disabled={!device || running} onClick={handleInstall} />
-            <br />
-
-            <h2>3. Joining SmartDust ZeroTier Network</h2>
-            <Text><b>Before you begin:</b></Text>
-            <ul>
-                <li>Make sure your device is online! If it's not, turn on WiFi and connect to a network now.</li>
-                <li>Make sure your phone is unlocked and the screen is on.</li>
-                <li>Do not touch your phone during the procedure!</li>
-            </ul>
-            <Text>Unless you know what you're doing, leave the Network ID input as it is.</Text>
-            <Text>Click <b>Join Network</b> and wait until it becomes enabled again, then move to the next step.</Text>
-            <StackItem>
-                <Stack horizontal>
-                    <StackItem><Text>Network ID:&nbsp;</Text></StackItem>
-                    <StackItem grow> <TextField value={networkId} onChange={handleNetworkIdChange} disabled={running} /> </StackItem>
-                </Stack>
-            </StackItem>
-            <DefaultButton text="Join Network" disabled={!device || running} onClick={handleJoin} />
-            <br />
-
-            <h2>4. Getting the ZeroTier IP Address</h2>
-            <Text>Click <b>Wait for IP</b> and wait until an IP address shows up in the box below.</Text>
-            <DefaultButton text="Wait for IP" disabled={!device || running} onClick={handleWaitForIp} />
-            <TextField value={zeroTierIp} onChange={handleZeroTierIpChange} />
-            <br />
-
-            <h2>5. Connecting SmartDust Provider to the device</h2>
-            <Text>Click <b>Switch to TCP</b>. Your device will now disconnect from this page, <b>this is normal!</b></Text>
-            <DefaultButton text="Switch to TCP" disabled={!device || running} onClick={handleTcp} />
-            <Text>Copy the IP Address from the previous step into the box at the top of the page and click the <b>Connect</b> button next to it.</Text>
-            <Text><b>That's it!</b> Your device should now be available in SmartDust!</Text>
-            <br />
-            <br />
+            <h1>Instructions</h1>
+            <table>
+                <tr><th>Step</th><th>Explanation</th><th>Action</th></tr>
+                <tr>
+                    <td><b>1. Connecting your device to this page</b></td>
+                    <td>
+                        <p>
+                            In the box to the right:
+                            <ul>
+                                <li>Click <b>Add Device</b>, select your device and press <b>connect</b></li>
+                                <li>Click <b>Connect</b></li>
+                                <li>On your device you should see a dialog with a server key fingerprint. Make sure it's
+                                    this:
+                                </li>
+                                <ul>
+                                    <li><code>{serverKeyFingerprint}</code></li>
+                                </ul>
+                                <li><b>If it's different, reload this page and start over!</b></li>
+                                <li>If the key matches, check the checkbox and click <b>Allow</b>.</li>
+                            </ul>
+                        </p>
+                    </td>
+                    <td><Connect device={device} logger={logger.logger} onDeviceChange={setDevice}/></td>
+                </tr>
+                <tr>
+                    <td><b>2. Installing VPN app</b></td>
+                    <td><p>Click <b>Install VPN app</b> and wait until it becomes enabled again, then move to the next step.</p></td>
+                    <td><DefaultButton text="Install VPN app" disabled={!device || running} onClick={handleInstall} /></td>
+                </tr>
+                <tr>
+                    <td><b>3. Joining SmartDust ZeroTier Network</b></td>
+                    <td>
+                        <p><b>Before you begin:</b>
+                            <ul>
+                                <li>Make sure your device is online! If it's not, turn on WiFi and connect to a network
+                                    now.
+                                </li>
+                                <li>Make sure your phone is unlocked and the screen is on.</li>
+                                <li>Do not touch your phone during the procedure!</li>
+                            </ul>
+                            <p>Unless you know what you're doing, leave the Network ID input as it is.</p>
+                            <p>Click <b>Join Network</b> and wait until it becomes enabled again, then move to the next step.</p>
+                        </p>
+                    </td>
+                    <td>
+                        <p>Network ID:&nbsp;</p>
+                        <TextField value={networkId} onChange={handleNetworkIdChange} disabled={running} />
+                        <DefaultButton text="Join Network" disabled={!device || running} onClick={handleJoin} />
+                    </td>
+                </tr>
+                <tr>
+                    <td><b>4. Getting the Private Network IP Address</b></td>
+                    <td><p>Click <b>Wait for IP</b> and wait until an IP address shows up in the box to the right.</p></td>
+                    <td>
+                        <DefaultButton text="Wait for IP" disabled={!device || running} onClick={handleWaitForIp} />
+                        <TextField value={zeroTierIp} onChange={handleZeroTierIpChange} />
+                    </td>
+                </tr>
+                <tr>
+                    <td><b>5. Connecting SmartDust Provider to the device</b></td>
+                    <td>
+                        <p>Click <b>Switch to TCP</b>. Your device will now disconnect from this page, <b>this is normal!</b></p>
+                        <p>Copy the IP Address from the previous step into the box at the top of the page and click the <b>Connect</b> button next to it.</p>
+                        <p><b>That's it!</b> Your device should now be available in SmartDust!</p>
+                    </td>
+                    <td><DefaultButton text="Switch to TCP" disabled={!device || running} onClick={handleTcp} /></td>
+                </tr>
+            </table>
 
             <h2>Troubleshooting</h2>
             <ul>
                 <li><b>How do I enable USB Debugging?</b></li>
-                <ul><li><a href="https://smartdust.atlassian.net/wiki/spaces/SMARTDUST/pages/508624913/USB+Debugging">TODO</a></li></ul>
+                <ul><li><a href="https://smartdust.atlassian.net/wiki/spaces/SMARTDUST/pages/508624913/USB+Debugging">Check here</a> (will be moved out of confluence later)</li></ul>
                 <li><b><code>"Unable to claim interface"</code> during step 1</b></li>
                 <ul><li>You probably have an adb server running on your PC. Try running <code>adb kill-server</code> in the terminal. If that doesn't work, ask the SmartDust team for help.</li></ul>
-                <li><b>ZeroTier app is Offline</b></li>
+                <li><b>VPN app is Offline</b></li>
                 <ul><li>Your device might be offline. Turn on WiFi and make sure you are connected to a network.</li></ul>
-                <li><b>Problems with the ZeroTier app</b></li>
+                <li><b>Problems with the VPN app</b></li>
                 <ul>
                     <li>Use the button below to uninstall the app and go back to step 2</li>
-                    <li><DefaultButton text="Uninstall ZeroTier" disabled={!device || running} onClick={handleUninstall} /></li>
+                    <li><DefaultButton text="Uninstall VPN app" disabled={!device || running} onClick={handleUninstall} /></li>
                 </ul>
             </ul>
         </>
