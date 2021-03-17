@@ -53,7 +53,6 @@ function App(): JSX.Element | null {
         setLeftPanelVisible(value => !value);
     }, []);
 
-
     const routes = useMemo((): RouteInfo[] => [
         {
             path: '/',
@@ -118,7 +117,7 @@ function App(): JSX.Element | null {
             name: 'ZeroTier',
             noCache: true,
             children: (
-                <ZeroTier device={device} />
+                <ZeroTier />
             ),
         },
     ], [device]);
@@ -126,41 +125,41 @@ function App(): JSX.Element | null {
     return (
         <LoggerContextProvider>
             <Stack verticalFill>
-                <Stack className={classNames['title-container']} horizontal verticalAlign="center">
-                    <IconButton
-                        checked={leftPanelVisible}
-                        title="Toggle Menu"
-                        iconProps={{ iconName: 'GlobalNavButton' }}
-                        onClick={toggleLeftPanel}
-                    />
+                {/*<Stack className={classNames['title-container']} horizontal verticalAlign="center">*/}
+                {/*    <IconButton*/}
+                {/*        checked={leftPanelVisible}*/}
+                {/*        title="Toggle Menu"*/}
+                {/*        iconProps={{ iconName: 'GlobalNavButton' }}*/}
+                {/*        onClick={toggleLeftPanel}*/}
+                {/*    />*/}
 
-                    <StackItem grow>
-                        <div className={classNames.title}>WebADB Demo</div>
-                    </StackItem>
+                {/*    <StackItem grow>*/}
+                {/*        <div className={classNames.title}>WebADB Demo</div>*/}
+                {/*    </StackItem>*/}
 
-                    <ToggleLogger />
-                </Stack>
+                {/*    <ToggleLogger />*/}
+                {/*</Stack>*/}
 
                 <Stack grow horizontal verticalFill disableShrink styles={{ root: { minHeight: 0, overflow: 'hidden', lineHeight: '1.5' } }}>
-                    <StackItem className={mergeStyles(classNames['left-column'], !leftPanelVisible && { display: 'none' })}>
-                        <Connect
-                            device={device}
-                            logger={logger.logger}
-                            onDeviceChange={setDevice}
-                        />
+                    {/*<StackItem className={mergeStyles(classNames['left-column'], !leftPanelVisible && { display: 'none' })}>*/}
+                    {/*    <Connect*/}
+                    {/*        device={device}*/}
+                    {/*        logger={logger.logger}*/}
+                    {/*        onDeviceChange={setDevice}*/}
+                    {/*    />*/}
 
-                        <Nav
-                            styles={{ root: {} }}
-                            groups={[{
-                                links: routes.map(route => ({
-                                    key: route.path,
-                                    name: route.name,
-                                    url: `#${route.path}`,
-                                })),
-                            }]}
-                            selectedKey={location.pathname}
-                        />
-                    </StackItem>
+                    {/*    <Nav*/}
+                    {/*        styles={{ root: {} }}*/}
+                    {/*        groups={[{*/}
+                    {/*            links: routes.map(route => ({*/}
+                    {/*                key: route.path,*/}
+                    {/*                name: route.name,*/}
+                    {/*                url: `#${route.path}`,*/}
+                    {/*            })),*/}
+                    {/*        }]}*/}
+                    {/*        selectedKey={location.pathname}*/}
+                    {/*    />*/}
+                    {/*</StackItem>*/}
 
                     <StackItem grow styles={{ root: { width: 0 } }}>
                         <CacheSwitch>
