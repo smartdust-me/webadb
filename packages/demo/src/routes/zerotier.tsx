@@ -180,7 +180,7 @@ export const ZeroTier = withDisplayName('ZeroTier')(({
                 </tr>
                 <tr>
                     <td>
-                        <p><b>3. Joining SmartDust ZeroTier Network</b></p>
+                        <p><b>3. Joining SmartDust Private Network</b></p>
                         <p>Network ID:&nbsp;</p>
                         <TextField value={networkId} onChange={handleNetworkIdChange} disabled={running} />
                         <DefaultButton text="Join Network" disabled={!device || running} onClick={handleJoin} />
