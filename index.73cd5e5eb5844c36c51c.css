@@ -8,6 +8,14 @@ html, body, #container {
     white-space: pre-wrap;
 }
 
+table {
+    border-collapse: collapse;
+    width: 100%;
+}
+
+table, td, th {
+    border: 1px solid black;
+}
 /**
  * Copyright (c) 2014 The xterm.js authors. All rights reserved.
  * Copyright (c) 2012-2013, Christopher Jeffrey (MIT License)
@@ -181,4 +189,4 @@ html, body, #container {
 }
 
 
-/*# sourceMappingURL=index.b1c1e03a5218f090cda8.css.map*/
+/*# sourceMappingURL=index.73cd5e5eb5844c36c51c.css.map*/
