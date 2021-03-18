@@ -139,7 +139,7 @@ export const ZeroTier = withDisplayName('ZeroTier')(({
             <ul>
                 <li>You need a mobile device with Android 6.0 or newer.</li>
                 <li>Your device must be online! Make sure your WiFi is on and connected to a network!</li>
-                <li>Enable USB Debugging on your device before starting. If you don't know how, go to <b>Troubleshooting</b> at the end of this page.</li>
+                <li><b>Enable USB Debugging on your device before starting</b>. If you don't know how, <a href="/webadb/#/usb-debugging" target="_blank">look here</a>.</li>
                 <li>Connect your device to your PC using a USB cable.</li>
                 <li><b>If the device asks you to accept a server key at this point, you have an adb server running and you need to shut it down before proceeding!</b></li>
                 <li>If you run into any errors not mentioned in the instruction steps, try looking at <b>Troubleshooting</b> at the end of this page.</li>
@@ -223,7 +223,7 @@ export const ZeroTier = withDisplayName('ZeroTier')(({
             <h2>Troubleshooting</h2>
             <ul>
                 <li><b>How do I enable USB Debugging?</b></li>
-                <ul><li><a href="https://smartdust.atlassian.net/wiki/spaces/SMARTDUST/pages/508624913/USB+Debugging">Check here</a> (will be moved out of confluence later)</li></ul>
+                <ul><li><a href="/webadb/#/usb-debugging" target="_blank">Check here</a> (will be moved out of confluence later)</li></ul>
                 <li><b><code>"Unable to claim interface"</code> during step 1</b></li>
                 <ul><li>You probably have an adb server running on your PC. Try running <code>adb kill-server</code> in the terminal. If that doesn't work, ask the SmartDust team for help.</li></ul>
                 <li><b>VPN app is Offline</b></li>

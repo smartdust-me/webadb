@@ -7,6 +7,7 @@ import { HashRouter, Redirect, useLocation } from 'react-router-dom';
 import { AdbEventLogger, CacheRoute, CacheSwitch, Connect, ErrorDialogProvider, Logger, LoggerContextProvider, ToggleLogger } from './components';
 import './index.css';
 import { DeviceInfo, FileManager, FrameBuffer, Install, Intro, Scrcpy, Shell, TcpIp, ZeroTier } from './routes';
+import {UsbDebugging} from "./routes/usb-debugging";
 
 initializeIcons();
 
@@ -118,6 +119,14 @@ function App(): JSX.Element | null {
             noCache: true,
             children: (
                 <ZeroTier />
+            ),
+        },
+        {
+            path: '/usb-debugging',
+            name: 'UsbDebugging',
+            noCache: true,
+            children: (
+                <UsbDebugging />
             ),
         },
     ], [device]);
