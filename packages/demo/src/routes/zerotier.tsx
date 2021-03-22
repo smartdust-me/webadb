@@ -223,7 +223,7 @@ export const ZeroTier = withDisplayName('ZeroTier')(({
             <h2>Troubleshooting</h2>
             <ul>
                 <li><b>How do I enable USB Debugging?</b></li>
-                <ul><li><a href="/webadb/#/usb-debugging" target="_blank">Check here</a> (will be moved out of confluence later)</li></ul>
+                <ul><li><a href="/webadb/#/usb-debugging" target="_blank">Check here</a></li></ul>
                 <li><b><code>"Unable to claim interface"</code> during step 1</b></li>
                 <ul><li>You probably have an adb server running on your PC. Try running <code>adb kill-server</code> in the terminal. If that doesn't work, ask the SmartDust team for help.</li></ul>
                 <li><b>VPN app is Offline</b></li>

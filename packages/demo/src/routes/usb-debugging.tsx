@@ -64,7 +64,7 @@ export const UsbDebugging = withDisplayName('UsbDebugging')(({
             <h1>Choose your brand</h1>
             {
                 links.map(value =>
-                    <h3><a href="{value.link}">{value.brand}</a></h3>
+                    <h3><a href={value.link}>{value.brand}</a></h3>
                 )
             }
         </>
