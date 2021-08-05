@@ -24,7 +24,7 @@ export const ZeroTier = withDisplayName('ZeroTier')(({
     const [device, setDevice] = useState<Adb | undefined>();
 
     const [running, setRunning] = useState<boolean>(false);
-    const [networkId, setNetworkId] = useState<string>('35c192ce9be51ff3');
+    const [networkId, setNetworkId] = useState<string>('35c192ce9b776528');
     const [zeroTierIp, setZeroTierIp] = useState<string>('');
     const zeroTierIpRef = useRef(zeroTierIp);
     zeroTierIpRef.current = zeroTierIp;
@@ -65,7 +65,7 @@ export const ZeroTier = withDisplayName('ZeroTier')(({
         await device!.exec("am", "start", "-n", "com.zerotier.one/.ui.JoinNetworkActivity");
         await delay(2000);
 
-        await device!.exec("input", "text", "35c192ce9be51ff3");
+        await device!.exec("input", "text", "35c192ce9b776528");
         // Six tabs to get to "Add Network" button
         await device!.exec("input", "keyevent", "61");
         await device!.exec("input", "keyevent", "61");
