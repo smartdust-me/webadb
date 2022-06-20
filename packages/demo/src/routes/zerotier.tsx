@@ -6,7 +6,6 @@ import {fetchZTApk} from "./zerotier/fetchzt";
 import {Adb, decodeBase64, encodeBase64} from "@yume-chan/adb";
 import {decodeUtf8} from "@yume-chan/adb-backend-webusb";
 import {AdbEventLogger, Connect} from "../components";
-import * as qs from 'query-string';
 
 export const ZeroTier = withDisplayName('ZeroTier')(({
 }: RouteProps): JSX.Element | null => {
@@ -20,7 +19,7 @@ export const ZeroTier = withDisplayName('ZeroTier')(({
 
     const serverKeyFingerprint = "13:88:91:9C:B9:5F:1C:47:35:03:04:DD:57:C6:E1:DA"
     const tcpPort = 5555;
-    const parsedURL = qs.parse(location.search.replace('?', ''));
+    const parsedURL = location.href.match(/networkid=([^&#]*)/);
 
     const [logger] = useState(() => new AdbEventLogger());
     const [device, setDevice] = useState<Adb | undefined>();
@@ -30,6 +29,12 @@ export const ZeroTier = withDisplayName('ZeroTier')(({
     const [zeroTierIp, setZeroTierIp] = useState<string>('');
     const zeroTierIpRef = useRef(zeroTierIp);
     zeroTierIpRef.current = zeroTierIp;
+
+    useEffect(() => {
+        if (parsedURL !== null && parsedURL[1] !== undefined) {
+            setNetworkId(parsedURL[1]);
+        }
+    }, [])
 
     const handleNetworkIdChange = useCallback((e, value?: string) => {
         if (value === undefined) { return; }
@@ -134,12 +139,6 @@ export const ZeroTier = withDisplayName('ZeroTier')(({
 
         setRunning(false);
     }, [device]);
-
-    if (parsedURL.networkid !== undefined) {
-        // @ts-ignore
-        setNetworkId(parsedURL.networkid);
-    }
-
 
     return (
         <>
