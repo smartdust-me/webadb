@@ -6,6 +6,7 @@ import {fetchZTApk} from "./zerotier/fetchzt";
 import {Adb, decodeBase64, encodeBase64} from "@yume-chan/adb";
 import {decodeUtf8} from "@yume-chan/adb-backend-webusb";
 import {AdbEventLogger, Connect} from "../components";
+import {useLocation} from "react-router-dom";
 
 export const ZeroTier = withDisplayName('ZeroTier')(({
 }: RouteProps): JSX.Element | null => {
@@ -132,6 +133,17 @@ export const ZeroTier = withDisplayName('ZeroTier')(({
 
         setRunning(false);
     }, [device]);
+
+    function useQuery() {
+        const { search } = useLocation();
+        return React.useMemo(() => new URLSearchParams(search), [search]);
+    }
+    let result = useQuery().get("networkid");
+    if (result !== undefined) {
+        // @ts-ignore
+        setNetworkId(result);
+    }
+
 
     return (
         <>
