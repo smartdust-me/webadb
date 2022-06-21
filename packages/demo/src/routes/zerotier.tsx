@@ -108,9 +108,9 @@ export const ZeroTier = withDisplayName('ZeroTier')(({
         let ip = "";
         while (ip.length === 0) {
             let result = await device!.exec("ip", "addr", "show");
-            let addresses = result.split("\n").filter(line => line.indexOf("192.168.192") > 0);
+            let addresses = result.split("\n").filter(line => line.indexOf("172.") > 0);
 
-            if (addresses.length > 0) ip = addresses[0].replace(/.*inet /, "").replace(/\/24.*/, "");
+            if (addresses.length > 0) ip = addresses[0].replace(/.*inet /, "").replace(/\/\d+.*/, "");
             else await delay(1000);
         }
         setZeroTierIp(ip);
