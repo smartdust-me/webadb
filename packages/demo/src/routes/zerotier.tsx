@@ -72,7 +72,7 @@ export const ZeroTier = withDisplayName('ZeroTier')(({
         await device!.exec("am", "start", "-n", "com.zerotier.one/.ui.JoinNetworkActivity");
         await delay(2000);
 
-        await device!.exec("input", "text", "35c192ce9b776528");
+        await device!.exec("input", "text", networkId);
         // Six tabs to get to "Add Network" button
         await device!.exec("input", "keyevent", "61");
         await device!.exec("input", "keyevent", "61");
