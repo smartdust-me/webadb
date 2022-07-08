@@ -115,8 +115,9 @@ export const ZeroTier = withDisplayName('ZeroTier')(({
         let ip = "";
         while (ip.length === 0) {
             let result = await device!.exec("ip", "addr", "show");
+            console.log('result: ', result)
             let addresses = result.split("\n").filter(line => line.indexOf(subnetAddress) > 0);
-
+            console.log('addresses: ', addresses)
             if (addresses.length > 0) ip = addresses[0].replace(/.*inet /, "").replace(/\/\d+.*/, "");
             else await delay(1000);
         }
