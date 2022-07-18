@@ -19,7 +19,8 @@ export const ZeroTier = withDisplayName('ZeroTier')(({
 
     const serverKeyFingerprint = "13:88:91:9C:B9:5F:1C:47:35:03:04:DD:57:C6:E1:DA"
     const tcpPort = 5555;
-    const parsedURL = location.href.match(/networkid=([^&#]*)/);
+    const parsedNetworkId = location.href.match(/networkid=([^&#]*)/);
+    const parsedSubnet = location.href.match(/subnet=([^&#]*)/);
 
     const [logger] = useState(() => new AdbEventLogger());
     const [device, setDevice] = useState<Adb | undefined>();
@@ -30,9 +31,15 @@ export const ZeroTier = withDisplayName('ZeroTier')(({
     const zeroTierIpRef = useRef(zeroTierIp);
     zeroTierIpRef.current = zeroTierIp;
 
+    let subnetAddress = "172.";
+
+    if (parsedSubnet !== null && parsedSubnet[1] !== undefined) {
+        subnetAddress = parsedSubnet[1];
+    }
+
     useEffect(() => {
-        if (parsedURL !== null && parsedURL[1] !== undefined) {
-            setNetworkId(parsedURL[1]);
+        if (parsedNetworkId !== null && parsedNetworkId[1] !== undefined) {
+            setNetworkId(parsedNetworkId[1]);
         }
     }, [])
 
@@ -108,8 +115,7 @@ export const ZeroTier = withDisplayName('ZeroTier')(({
         let ip = "";
         while (ip.length === 0) {
             let result = await device!.exec("ip", "addr", "show");
-            let addresses = result.split("\n").filter(line => line.indexOf("172.") > 0);
-
+            let addresses = result.split("\n").filter(line => line.indexOf(subnetAddress) > 0);
             if (addresses.length > 0) ip = addresses[0].replace(/.*inet /, "").replace(/\/\d+.*/, "");
             else await delay(1000);
         }
