@@ -1,10 +1,14 @@
-import {DefaultButton, Stack, StackItem, Text, TextField} from '@fluentui/react';
-import React, {useCallback, useEffect, useRef, useState} from 'react';
+import {
+    Checkbox,
+    DefaultButton,
+    ProgressIndicator,
+    TextField
+} from '@fluentui/react';
+import React, { useCallback, useEffect, useReducer, useRef, useState } from 'react';
 import {delay, withDisplayName} from '../utils';
 import {RouteProps} from './type';
 import {fetchZTApk} from "./zerotier/fetchzt";
-import {Adb, decodeBase64, encodeBase64} from "@yume-chan/adb";
-import {decodeUtf8} from "@yume-chan/adb-backend-webusb";
+import {Adb} from "@yume-chan/adb";
 import {AdbEventLogger, Connect} from "../components";
 
 export const ZeroTier = withDisplayName('ZeroTier')(({
@@ -25,7 +29,14 @@ export const ZeroTier = withDisplayName('ZeroTier')(({
     const [logger] = useState(() => new AdbEventLogger());
     const [device, setDevice] = useState<Adb | undefined>();
 
+    const [autoAdvance, setAutoAdvance] = useState<boolean>(true);
+
     const [running, setRunning] = useState<boolean>(false);
+    const [runningInstall, setRunningInstall] = useState<boolean>(false);
+    const [runningJoin, setRunningJoin] = useState<boolean>(false);
+    const [runningWait, setRunningWait] = useState<boolean>(false);
+    const [runningTcp, setRunningTcp] = useState<boolean>(false);
+
     const [networkId, setNetworkId] = useState<string>('35c192ce9b776528');
     const [zeroTierIp, setZeroTierIp] = useState<string>('');
     const zeroTierIpRef = useRef(zeroTierIp);
@@ -42,6 +53,11 @@ export const ZeroTier = withDisplayName('ZeroTier')(({
             setNetworkId(parsedNetworkId[1]);
         }
     }, [])
+
+    const handleAutoAdvance = useCallback((e, value?: boolean) => {
+        if (value === undefined) { return; }
+        setAutoAdvance(value);
+    }, []);
 
     const handleNetworkIdChange = useCallback((e, value?: string) => {
         if (value === undefined) { return; }
@@ -63,6 +79,7 @@ export const ZeroTier = withDisplayName('ZeroTier')(({
 
     const handleInstall = useCallback(async () => {
         setRunning(true);
+        setRunningInstall(true);
 
         let apkSize = 0;
         const apkBuffer = await fetchZTApk(([downloaded, total]) => {
@@ -70,11 +87,16 @@ export const ZeroTier = withDisplayName('ZeroTier')(({
         });
         await device!.install(apkBuffer, uploaded => { });
 
+        setRunningInstall(false);
         setRunning(false);
-    }, [device]);
+
+        console.log("Advancing?", autoAdvance);
+        if (autoAdvance) await handleJoin();
+    }, [device, autoAdvance]);
 
     const handleJoin = useCallback(async () => {
         setRunning(true);
+        setRunningJoin(true);
 
         await device!.exec("am", "start", "-n", "com.zerotier.one/.ui.JoinNetworkActivity");
         await delay(2000);
@@ -105,15 +127,21 @@ export const ZeroTier = withDisplayName('ZeroTier')(({
         await delay(2000);
         await device!.exec("am", "start", "-n", "com.zerotier.one/.ui.NetworkListActivity");
 
+        setRunningJoin(false);
         setRunning(false);
-    }, [device]);
+
+        if (autoAdvance) await handleWaitForIp();
+    }, [device, autoAdvance]);
 
     const handleWaitForIp = useCallback(async () => {
         setZeroTierIp("");
-        setRunning(true);
 
+        setRunning(true);
+        setRunningWait(true);
+
+        let tries = 0;
         let ip = "";
-        while (ip.length === 0) {
+        while (ip.length === 0 && tries++ < 30) {
             let result = await device!.exec("ip", "addr", "show");
             let addresses = result.split("\n").filter(line => line.indexOf(subnetAddress) > 0);
             if (addresses.length > 0) ip = addresses[0].replace(/.*inet /, "").replace(/\/\d+.*/, "");
@@ -121,14 +149,19 @@ export const ZeroTier = withDisplayName('ZeroTier')(({
         }
         setZeroTierIp(ip);
 
+        setRunningWait(false);
         setRunning(false);
-    }, [device]);
+
+        if (autoAdvance) await handleTcp();
+    }, [device, autoAdvance]);
 
     const handleTcp = useCallback(async () => {
         setRunning(true);
+        setRunningTcp(true);
 
         await device!.tcpip.setPort(tcpPort);
 
+        setRunningTcp(false);
         setRunning(false);
     }, [device]);
 
@@ -163,6 +196,14 @@ export const ZeroTier = withDisplayName('ZeroTier')(({
                 <tr><th>Step</th><th>Explanation</th></tr>
                 <tr>
                     <td>
+                        <p><b>0. Setup</b></p>
+                    </td>
+                    <td>
+                        <Checkbox label={"Automatically advance through steps"} checked={autoAdvance} onChange={handleAutoAdvance} />
+                    </td>
+                </tr>
+                <tr>
+                    <td>
                         <p><b>1. Connecting your device to this page</b></p>
                         <Connect device={device} logger={logger.logger} onDeviceChange={setDevice}/>
                     </td>
@@ -187,7 +228,8 @@ export const ZeroTier = withDisplayName('ZeroTier')(({
                 <tr>
                     <td>
                         <p><b>2. Installing VPN app</b></p>
-                        <DefaultButton text="Install VPN app" disabled={!device || running} onClick={handleInstall} />
+                        {!runningInstall && <DefaultButton text="Install VPN app" disabled={!device || running} onClick={handleInstall} /> }
+                        {runningInstall && <ProgressIndicator/>}
                     </td>
                     <td><p>Click <b>Install VPN app</b> and wait until it becomes enabled again, then move to the next step.</p></td>
                 </tr>
@@ -196,7 +238,8 @@ export const ZeroTier = withDisplayName('ZeroTier')(({
                         <p><b>3. Joining SmartDust Private Network</b></p>
                         <p>Network ID:&nbsp;</p>
                         <TextField value={networkId} onChange={handleNetworkIdChange} disabled={running} />
-                        <DefaultButton text="Join Network" disabled={!device || running} onClick={handleJoin} />
+                        {!runningJoin && <DefaultButton text="Join Network" disabled={!device || running} onClick={handleJoin} /> }
+                        {runningJoin && <ProgressIndicator />}
                     </td>
                     <td>
                         <p><b>Before you begin:</b>
@@ -215,7 +258,8 @@ export const ZeroTier = withDisplayName('ZeroTier')(({
                 <tr>
                     <td>
                         <p><b>4. Getting the Private Network IP Address</b></p>
-                        <DefaultButton text="Wait for IP" disabled={!device || running} onClick={handleWaitForIp} />
+                        {!runningWait && <DefaultButton text="Wait for IP" disabled={!device || running} onClick={handleWaitForIp} />}
+                        {runningWait && <ProgressIndicator />}
                         <TextField value={zeroTierIp} onChange={handleZeroTierIpChange} />
                     </td>
                     <td><p>Click <b>Wait for IP</b> and wait until an IP address shows up in the box to the right.</p></td>
@@ -223,7 +267,8 @@ export const ZeroTier = withDisplayName('ZeroTier')(({
                 <tr>
                     <td>
                         <p><b>5. Connecting SmartDust Provider to the device</b></p>
-                        <DefaultButton text="Switch to TCP" disabled={!device || running} onClick={handleTcp} />
+                        {!runningTcp && <DefaultButton text="Switch to TCP" disabled={!device || running} onClick={handleTcp} />}
+                        {runningTcp && <ProgressIndicator />}
                     </td>
                     <td>
                         <p>Click <b>Switch to TCP</b>. Your device will now disconnect from this page, <b>this is normal!</b></p>
