@@ -95,6 +95,7 @@ export const Connect = withDisplayName('Connect')(({
         try {
             if (selectedBackend) {
                 const device = new Adb(selectedBackend, logger);
+                console.log('jaki jest device?: ', device)
                 try {
                     setConnecting(true);
                     await device.connect();
