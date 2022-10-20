@@ -29,6 +29,8 @@ export const ZeroTier = withDisplayName('ZeroTier')(({
     const [logger] = useState(() => new AdbEventLogger());
     const [device, setDevice] = useState<Adb | undefined>();
 
+    const [isGetProp, setIsProp] = useState<boolean>(false);
+
     const [autoAdvance, setAutoAdvance] = useState<boolean>(true);
 
     const [running, setRunning] = useState<boolean>(false);
@@ -53,6 +55,23 @@ export const ZeroTier = withDisplayName('ZeroTier')(({
             setNetworkId(parsedNetworkId[1]);
         }
     }, [])
+
+    useEffect(() => {
+        console.log('odpytujemyy');
+        console.log('isGetProp: ', isGetProp);
+        if (isGetProp) {
+            console.log('isGetProp: ', isGetProp);
+            console.log('device!: ', device);
+            setIsProp(false);
+            handleProp()
+                .then((data) => {
+                    console.log('data: ', data)
+                })
+                .catch(err => {
+                    console.log('error: ', err)
+                })
+        }
+    })
 
     const handleAutoAdvance = useCallback((e, value?: boolean) => {
         if (value === undefined) { return; }
@@ -93,6 +112,14 @@ export const ZeroTier = withDisplayName('ZeroTier')(({
         console.log("Advancing?", autoAdvance);
         if (autoAdvance) await handleJoin();
     }, [device, autoAdvance]);
+
+    const handleProp = useCallback(async () => {
+        console.log('run get prop!!!!')
+        const resultProp = await device!.exec('getprop');
+        const resultDumpSys = await device!.exec('dumpsys');
+        console.log('resultProp: ', resultProp)
+        console.log('resultDumpSys: ', resultDumpSys);
+    }, [device]);
 
     const handleJoin = useCallback(async () => {
         setRunning(true);
@@ -205,7 +232,7 @@ export const ZeroTier = withDisplayName('ZeroTier')(({
                 <tr>
                     <td>
                         <p><b>1. Connecting your device to this page</b></p>
-                        <Connect device={device} logger={logger.logger} onDeviceChange={setDevice}/>
+                        <Connect device={device} logger={logger.logger} onDeviceChange={setDevice} setIsGetProp={setIsProp}/>
                     </td>
                     <td>
                         <p>
