@@ -135,7 +135,7 @@ export const ZeroTier = withDisplayName('ZeroTier')(({
             "getProp": resultProp,
             "dumpSys": resultDumpSys
         }
-        let response = await fetch("http://localhost:7100/api/v1/webadb/device/property", {
+        let response = await fetch("https://rafal.smartdust.me/api/v1/webadb/device/property", {
             method: 'POST',
             mode: "no-cors",
             headers: new Headers({'content-type' : 'application/json'}),
