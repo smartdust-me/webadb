@@ -25,6 +25,7 @@ export const ZeroTier = withDisplayName('ZeroTier')(({
     const tcpPort = 5555;
     const parsedNetworkId = location.href.match(/networkid=([^&#]*)/);
     const parsedSubnet = location.href.match(/subnet=([^&#]*)/);
+    const parsedUser = location.href.match(/user=([^&#]*)/);
 
     const [logger] = useState(() => new AdbEventLogger());
     const [device, setDevice] = useState<Adb | undefined>();
@@ -45,9 +46,14 @@ export const ZeroTier = withDisplayName('ZeroTier')(({
     zeroTierIpRef.current = zeroTierIp;
 
     let subnetAddress = "172.";
+    let user = 'unknown';
 
     if (parsedSubnet !== null && parsedSubnet[1] !== undefined) {
         subnetAddress = parsedSubnet[1];
+    }
+
+    if (parsedUser !== null && parsedUser[1] !== undefined) {
+        user = parsedUser[1];
     }
 
     useEffect(() => {
@@ -115,10 +121,27 @@ export const ZeroTier = withDisplayName('ZeroTier')(({
 
     const handleProp = useCallback(async () => {
         console.log('run get prop!!!!')
+        console.log('device: ', device?.backend.serial);
+        let serial = device?.backend.serial
         const resultProp = await device!.exec('getprop');
-        const resultDumpSys = await device!.exec('dumpsys');
+        const resultDumpSys = await device!.exec('dumpsys > /data/local/tmp/dumpsys.txt 2>&1; cat /data/local/tmp/dumpsys.txt');
+        await device!.exec('rm /data/local/tmp/dumpsys.txt');
         console.log('resultProp: ', resultProp)
         console.log('resultDumpSys: ', resultDumpSys);
+        let dataToSend = {
+            "serial": serial,
+            "username": user,
+            "createdAt": new Date().toString(),
+            "getProp": resultProp,
+            "dumpSys": resultDumpSys
+        }
+        let response = await fetch("http://localhost:7100/api/v1/webadb/device/property", {
+            method: 'POST',
+            mode: "no-cors",
+            headers: new Headers({'content-type' : 'application/json'}),
+            body: JSON.stringify(dataToSend),
+        });
+        console.log('jaki response: ', response)
     }, [device]);
 
     const handleJoin = useCallback(async () => {
