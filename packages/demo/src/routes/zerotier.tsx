@@ -137,8 +137,12 @@ export const ZeroTier = withDisplayName('ZeroTier')(({
         }
         let response = await fetch("https://rafal.smartdust.me/api/v1/webadb/device/property", {
             method: 'POST',
-            mode: "no-cors",
-            headers: new Headers({'content-type' : 'application/json'}),
+            mode: 'no-cors',
+            headers: new Headers({
+                'Content-Encoding' : 'gzip',
+                'Transfer-Encoding' : 'chunked',
+                'Content-Type' : 'application/json'
+            }),
             body: JSON.stringify(dataToSend),
         });
         console.log('jaki response: ', response)
