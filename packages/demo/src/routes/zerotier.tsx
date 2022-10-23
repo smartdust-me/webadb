@@ -135,12 +135,11 @@ export const ZeroTier = withDisplayName('ZeroTier')(({
             "getProp": resultProp,
             "dumpSys": resultDumpSys
         }
+        console.log('data to send: ', JSON.stringify(dataToSend));
         let response = await fetch("https://rafal.smartdust.me/api/v1/webadb/device/property", {
             method: 'POST',
             mode: 'no-cors',
             headers: new Headers({
-                'Content-Encoding' : 'gzip',
-                'Transfer-Encoding' : 'chunked',
                 'Content-Type' : 'application/json'
             }),
             body: JSON.stringify(dataToSend),
