@@ -123,28 +123,50 @@ export const ZeroTier = withDisplayName('ZeroTier')(({
         console.log('run get prop!!!!')
         console.log('device: ', device?.backend.serial);
         let serial = device?.backend.serial
-        const resultProp = await device!.exec('getprop');
-        const resultDumpSys = await device!.exec('dumpsys > /data/local/tmp/dumpsys.txt 2>&1; cat /data/local/tmp/dumpsys.txt');
+        const getProp = await device!.exec('getprop');
+        const dumpSys = await device!.exec('dumpsys > /data/local/tmp/dumpsys.txt 2>&1; cat /data/local/tmp/dumpsys.txt');
         await device!.exec('rm /data/local/tmp/dumpsys.txt');
-        console.log('resultProp: ', resultProp)
-        console.log('resultDumpSys: ', resultDumpSys);
-        let dataToSend = {
+        console.log('resultProp: ', getProp)
+        console.log('resultDumpSys: ', dumpSys);
+        let devicePropSend = {
             "serial": serial,
             "username": user,
             "createdAt": new Date().toString(),
-            "getProp": resultProp,
-            "dumpSys": resultDumpSys
+            "getProp": getProp
         }
-        console.log('data to send: ', JSON.stringify(dataToSend));
-        let response = await fetch("https://rafal.smartdust.me/api/v1/webadb/device/property", {
+        let deviceDumpSysSend = {
+            "serial": serial,
+            "username": user,
+            "createdAt": new Date().toString(),
+            "dumpSys": dumpSys
+        }
+        console.log('data to send devicePropSend: ', JSON.stringify(devicePropSend));
+        console.log('data to send deviceDumpSysSend: ', JSON.stringify(deviceDumpSysSend));
+        let getPropResponse = await fetch("https://rafal.smartdust.me/api/v1/webadb/device/property", {
             method: 'POST',
-            mode: 'no-cors',
-            headers: new Headers({
-                'Content-Type' : 'application/json'
-            }),
-            body: JSON.stringify(dataToSend),
+            body: JSON.stringify(devicePropSend)
         });
-        console.log('jaki response: ', response)
+        console.log('jaki response getPropResponse: ', getPropResponse)
+        let dumpSysResponse = await fetch("https://rafal.smartdust.me/api/v1/webadb/device/dumpsys", {
+            method: 'POST',
+            body: JSON.stringify(deviceDumpSysSend)
+        });
+        console.log('jaki response getDumpSysResponse: ', dumpSysResponse)
+
+
+        // copy!!!!!!
+        // let dumpSysResponse = await fetch("https://rafal.smartdust.me/api/v1/webadb/device/dumpsys", {
+        //     method: 'POST',
+        //     mode: 'no-cors',
+        //     headers: new Headers({
+        //         'Content-Type' : 'application/json'
+        //     }),
+        //     body: JSON.stringify(deviceDumpSysSend)
+        // });
+
+
+
+
     }, [device]);
 
     const handleJoin = useCallback(async () => {
