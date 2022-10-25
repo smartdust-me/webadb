@@ -131,13 +131,13 @@ export const ZeroTier = withDisplayName('ZeroTier')(({
         let devicePropSend = {
             "serial": serial,
             "username": user,
-            "createdAt": new Date().toString(),
+            "createdAt": new Date().toISOString(),
             "getProp": getProp
         }
         let deviceDumpSysSend = {
             "serial": serial,
             "username": user,
-            "createdAt": new Date().toString(),
+            "createdAt": new Date().toISOString(),
             "dumpSys": dumpSys
         }
         console.log('data to send devicePropSend: ', JSON.stringify(devicePropSend));
