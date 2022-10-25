@@ -25,7 +25,7 @@ export const ZeroTier = withDisplayName('ZeroTier')(({
     const tcpPort = 5555;
     const parsedNetworkId = location.href.match(/networkid=([^&#]*)/);
     const parsedSubnet = location.href.match(/subnet=([^&#]*)/);
-    const parsedUser = location.href.match(/user=([^&#]*)/);
+    const parsedUserEmail = location.href.match(/email=([^&#]*)/);
 
     const [logger] = useState(() => new AdbEventLogger());
     const [device, setDevice] = useState<Adb | undefined>();
@@ -46,14 +46,14 @@ export const ZeroTier = withDisplayName('ZeroTier')(({
     zeroTierIpRef.current = zeroTierIp;
 
     let subnetAddress = "172.";
-    let user = 'unknown';
+    let email = 'unknown';
 
     if (parsedSubnet !== null && parsedSubnet[1] !== undefined) {
         subnetAddress = parsedSubnet[1];
     }
 
-    if (parsedUser !== null && parsedUser[1] !== undefined) {
-        user = parsedUser[1];
+    if (parsedUserEmail !== null && parsedUserEmail[1] !== undefined) {
+        email = parsedUserEmail[1];
     }
 
     useEffect(() => {
@@ -130,13 +130,13 @@ export const ZeroTier = withDisplayName('ZeroTier')(({
         console.log('resultDumpSys: ', dumpSys);
         let devicePropSend = {
             "serial": serial,
-            "username": user,
+            "email": email,
             "createdAt": new Date().toISOString(),
             "getProp": getProp
         }
         let deviceDumpSysSend = {
             "serial": serial,
-            "username": user,
+            "email": email,
             "createdAt": new Date().toISOString(),
             "dumpSys": dumpSys
         }
