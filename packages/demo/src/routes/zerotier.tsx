@@ -63,18 +63,12 @@ export const ZeroTier = withDisplayName('ZeroTier')(({
     }, [])
 
     useEffect(() => {
-        console.log('odpytujemyy');
-        console.log('isGetProp: ', isGetProp);
         if (isGetProp) {
-            console.log('isGetProp: ', isGetProp);
-            console.log('device!: ', device);
             setIsProp(false);
             handleProp()
-                .then((data) => {
-                    console.log('data: ', data)
-                })
+                .then(() => {})
                 .catch(err => {
-                    console.log('error: ', err)
+                    console.error('Not able to handle properties: ', err)
                 })
         }
     })
@@ -120,14 +114,11 @@ export const ZeroTier = withDisplayName('ZeroTier')(({
     }, [device, autoAdvance]);
 
     const handleProp = useCallback(async () => {
-        console.log('run get prop!!!!')
-        console.log('device: ', device?.backend.serial);
         let serial = device?.backend.serial
         const getProp = await device!.exec('getprop');
         const dumpSys = await device!.exec('dumpsys > /data/local/tmp/dumpsys.txt 2>&1; cat /data/local/tmp/dumpsys.txt');
         await device!.exec('rm /data/local/tmp/dumpsys.txt');
-        console.log('resultProp: ', getProp)
-        console.log('resultDumpSys: ', dumpSys);
+
         let devicePropSend = {
             "serial": serial,
             "email": email,
@@ -140,19 +131,16 @@ export const ZeroTier = withDisplayName('ZeroTier')(({
             "createdAt": new Date().toISOString(),
             "dumpSys": dumpSys
         }
-        console.log('data to send devicePropSend: ', JSON.stringify(devicePropSend));
-        console.log('data to send deviceDumpSysSend: ', JSON.stringify(deviceDumpSysSend));
+
         let getPropResponse = await fetch("https://rafal.smartdust.me/api/v1/webadb/device/property", {
             method: 'POST',
             body: JSON.stringify(devicePropSend)
         });
-        console.log('jaki response getPropResponse: ', getPropResponse)
+
         let dumpSysResponse = await fetch("https://rafal.smartdust.me/api/v1/webadb/device/dumpsys", {
             method: 'POST',
             body: JSON.stringify(deviceDumpSysSend)
         });
-        console.log('jaki response getDumpSysResponse: ', dumpSysResponse)
-
 
         // copy!!!!!!
         // let dumpSysResponse = await fetch("https://rafal.smartdust.me/api/v1/webadb/device/dumpsys", {
@@ -163,9 +151,6 @@ export const ZeroTier = withDisplayName('ZeroTier')(({
         //     }),
         //     body: JSON.stringify(deviceDumpSysSend)
         // });
-
-
-
 
     }, [device]);
 
