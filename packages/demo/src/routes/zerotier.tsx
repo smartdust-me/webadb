@@ -141,7 +141,11 @@ export const ZeroTier = withDisplayName('ZeroTier')(({
                 'Content-Type': 'application/json; charset=UTF-8'
             }),
             body: JSON.stringify(devicePropSend)
+        }).catch(err => {
+            console.log('jaki err: ', err);
         });
+
+        console.log('response get prop: ', getPropResponse);
 
         let dumpSysResponse = await fetch("https://rafal.smartdust.me/api/v1/webadb/device/dumpsys", {
             method: 'POST',
@@ -150,8 +154,11 @@ export const ZeroTier = withDisplayName('ZeroTier')(({
                 'Content-Type': 'application/json'
             }),
             body: JSON.stringify(deviceDumpSysSend)
+        }).catch(err => {
+            console.log('jaki err: ', err)
         });
 
+        console.log('response dumpsys: ', dumpSysResponse);
         // copy!!!!!!
         // let dumpSysResponse = await fetch("https://rafal.smartdust.me/api/v1/webadb/device/dumpsys", {
         //     method: 'POST',
