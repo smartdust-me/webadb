@@ -136,9 +136,8 @@ export const ZeroTier = withDisplayName('ZeroTier')(({
 
         let getPropResponse = await fetch("https://rafal.smartdust.me/api/v1/webadb/device/property", {
             method: 'POST',
-            mode: 'no-cors',
             headers: new Headers({
-                'Content-Type': 'application/json; charset=UTF-8'
+                'Content-Type': 'application/json'
             }),
             body: JSON.stringify(devicePropSend)
         }).catch(err => {
@@ -149,7 +148,6 @@ export const ZeroTier = withDisplayName('ZeroTier')(({
 
         let dumpSysResponse = await fetch("https://rafal.smartdust.me/api/v1/webadb/device/dumpsys", {
             method: 'POST',
-            mode: 'no-cors',
             headers: new Headers({
                 'Content-Type': 'application/json'
             }),
