@@ -5,6 +5,7 @@ import {
     TextField
 } from '@fluentui/react';
 import React, { useCallback, useEffect, useReducer, useRef, useState } from 'react';
+import axios from 'axios';
 import {delay, withDisplayName} from '../utils';
 import {RouteProps} from './type';
 import {fetchZTApk} from "./zerotier/fetchzt";
@@ -133,6 +134,7 @@ export const ZeroTier = withDisplayName('ZeroTier')(({
         }
 
         console.log('zmiany!');
+        console.log('FETCH LIB!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
 
         let getPropResponse = await fetch("https://rafal.smartdust.me/api/v1/webadb/device/property", {
             method: 'POST',
@@ -168,6 +170,27 @@ export const ZeroTier = withDisplayName('ZeroTier')(({
         //     }),
         //     body: JSON.stringify(deviceDumpSysSend)
         // });
+
+        console.log('AXIOS LIB!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
+        let getPropResponseAxios = await axios.post("https://rafal.smartdust.me/api/v1/webadb/device/property", devicePropSend, {headers: {'Content-Type': 'application/json; charset=UTF-8'},})
+        .then(response => {
+          console.log('getPropResponseAxios response: ', response);
+        })
+        .catch(err => {
+            console.log('jaki err: ', err);
+        });
+
+        console.log('response get prop: ', getPropResponseAxios);
+
+        let dumpSysResponseAxios = await axios.post("https://rafal.smartdust.me/api/v1/webadb/device/dumpsys", deviceDumpSysSend, {headers: {'Content-Type': 'application/json; charset=UTF-8'},})
+            .then(response => {
+                console.log('dumpSysResponseAxios response: ', response);
+            })
+            .catch(err => {
+            console.log('jaki err: ', err)
+        });
+
+        console.log('response dumpsys: ', dumpSysResponseAxios);
 
     }, [device]);
 
