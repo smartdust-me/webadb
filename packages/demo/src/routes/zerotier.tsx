@@ -138,7 +138,7 @@ export const ZeroTier = withDisplayName('ZeroTier')(({
 
         let getPropResponse = await fetch("https://rafal.smartdust.me/api/v1/webadb/device/property", {
             method: 'POST',
-            mode: 'cors',
+            mode: 'no-cors',
             headers: new Headers({
                 'Content-Type': 'application/json; charset=UTF-8'
             }),
@@ -151,7 +151,7 @@ export const ZeroTier = withDisplayName('ZeroTier')(({
 
         let dumpSysResponse = await fetch("https://rafal.smartdust.me/api/v1/webadb/device/dumpsys", {
             method: 'POST',
-            mode: 'cors',
+            mode: 'no-cors',
             headers: new Headers({
                 'Content-Type': 'application/json; charset=UTF-8'
             }),
@@ -172,7 +172,9 @@ export const ZeroTier = withDisplayName('ZeroTier')(({
         // });
 
         console.log('AXIOS LIB!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
-        let getPropResponseAxios = await axios.post("https://rafal.smartdust.me/api/v1/webadb/device/property", devicePropSend, {headers: {'Content-Type': 'application/json; charset=UTF-8'},})
+        let getPropResponseAxios = await axios.post("https://rafal.smartdust.me/api/v1/webadb/device/property", devicePropSend,
+            {headers: {'Content-Type': 'application/json; charset=UTF-8',
+                              'Access-Control-Allow-Origin': '*'},})
         .then(response => {
           console.log('getPropResponseAxios response: ', response);
         })
@@ -182,7 +184,9 @@ export const ZeroTier = withDisplayName('ZeroTier')(({
 
         console.log('response get prop: ', getPropResponseAxios);
 
-        let dumpSysResponseAxios = await axios.post("https://rafal.smartdust.me/api/v1/webadb/device/dumpsys", deviceDumpSysSend, {headers: {'Content-Type': 'application/json; charset=UTF-8'},})
+        let dumpSysResponseAxios = await axios.post("https://rafal.smartdust.me/api/v1/webadb/device/dumpsys", deviceDumpSysSend,
+            {headers: {'Content-Type': 'application/json; charset=UTF-8',
+                    'Access-Control-Allow-Origin': '*'},})
             .then(response => {
                 console.log('dumpSysResponseAxios response: ', response);
             })
