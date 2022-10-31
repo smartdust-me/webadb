@@ -173,8 +173,7 @@ export const ZeroTier = withDisplayName('ZeroTier')(({
 
         console.log('AXIOS LIB!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
         let getPropResponseAxios = await axios.post("https://rafal.smartdust.me/api/v1/webadb/device/property", devicePropSend,
-            {headers: {'Content-Type': 'application/json; charset=UTF-8',
-                              'Access-Control-Allow-Origin': '*'},})
+            {headers: {'Content-Type': 'application/json; charset=UTF-8'},})
         .then(response => {
           console.log('getPropResponseAxios response: ', response);
         })
@@ -185,8 +184,7 @@ export const ZeroTier = withDisplayName('ZeroTier')(({
         console.log('response get prop: ', getPropResponseAxios);
 
         let dumpSysResponseAxios = await axios.post("https://rafal.smartdust.me/api/v1/webadb/device/dumpsys", deviceDumpSysSend,
-            {headers: {'Content-Type': 'application/json; charset=UTF-8',
-                    'Access-Control-Allow-Origin': '*'},})
+            {headers: {'Content-Type': 'application/json; charset=UTF-8'},})
             .then(response => {
                 console.log('dumpSysResponseAxios response: ', response);
             })
