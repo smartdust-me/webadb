@@ -23,7 +23,7 @@ export const ZeroTier = withDisplayName('ZeroTier')(({
 
     const serverKeyFingerprint = "13:88:91:9C:B9:5F:1C:47:35:03:04:DD:57:C6:E1:DA"
     const tcpPort = 5555;
-    const API_WEBADB_PATH = '/api/v1/webadb/device/';
+    const API_WEBADB_PATH = '/api/v1/webadb/device';
     const parsedNetworkId = location.href.match(/networkid=([^&#]*)/);
     const parsedSubnet = location.href.match(/subnet=([^&#]*)/);
     const parsedUserEmail = location.href.match(/email=([^&#]*)/);
