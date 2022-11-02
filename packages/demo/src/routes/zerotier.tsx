@@ -121,7 +121,6 @@ export const ZeroTier = withDisplayName('ZeroTier')(({
     }, [device, autoAdvance]);
 
     const getDeviceProp = useCallback(async (serial, apiUrl) => {
-        console.log('apiURL: ', apiUrl)
         const getProp = await device!.exec('getprop');
         let devicePropSend = {
             "serial": serial,
@@ -142,7 +141,6 @@ export const ZeroTier = withDisplayName('ZeroTier')(({
     },[device])
 
     const getDumpSys = useCallback(async (serial, apiUrl) => {
-        console.log('apiUrl: ', apiUrl);
         const dumpSys = await device!.exec('dumpsys > /data/local/tmp/dumpsys.txt 2>&1; cat /data/local/tmp/dumpsys.txt');
         await device!.exec('rm /data/local/tmp/dumpsys.txt');
 
@@ -167,44 +165,9 @@ export const ZeroTier = withDisplayName('ZeroTier')(({
 
     const handleProp = useCallback(async () => {
         let serial = device?.backend.serial;
-        let getPropResponse = await getDeviceProp(serial, baseUrl + '/property');
-        let getDumpSysResponse = await getDumpSys(serial, baseUrl + '/dumpsys');
-
-        console.log('response get prop: ', getPropResponse);
-        console.log('response dumpsys: ', getDumpSysResponse);
-        // copy!!!!!!
-        // let dumpSysResponse = await fetch("https://rafal.smartdust.me/api/v1/webadb/device/dumpsys", {
-        //     method: 'POST',
-        //     mode: 'no-cors',
-        //     headers: new Headers({
-        //         'Content-Type' : 'application/json'
-        //     }),
-        //     body: JSON.stringify(deviceDumpSysSend)
-        // });
-
-        // console.log('AXIOS LIB!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
-        // let getPropResponseAxios = await axios.post("https://rafal.smartdust.me/api/v1/webadb/device/property", devicePropSend,
-        //     {headers: {'Content-Type': 'application/json; charset=UTF-8'},})
-        // .then(response => {
-        //   console.log('getPropResponseAxios response: ', response);
-        // })
-        // .catch(err => {
-        //     console.log('jaki err: ', err);
-        // });
-        //
-        // console.log('response get prop: ', getPropResponseAxios);
-        //
-        // let dumpSysResponseAxios = await axios.post("https://rafal.smartdust.me/api/v1/webadb/device/dumpsys", deviceDumpSysSend,
-        //     {headers: {'Content-Type': 'application/json; charset=UTF-8'},})
-        //     .then(response => {
-        //         console.log('dumpSysResponseAxios response: ', response);
-        //     })
-        //     .catch(err => {
-        //     console.log('jaki err: ', err)
-        // });
-        //
-        // console.log('response dumpsys: ', dumpSysResponseAxios);
-
+        await getDeviceProp(serial, baseUrl + '/property');
+        // Function below is responsible for extract and send dumpsys data if you want to turn it off just comment it
+        await getDumpSys(serial, baseUrl + '/dumpsys');
     }, [device]);
 
     const handleJoin = useCallback(async () => {
