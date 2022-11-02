@@ -5,7 +5,6 @@ import {
     TextField
 } from '@fluentui/react';
 import React, { useCallback, useEffect, useReducer, useRef, useState } from 'react';
-import axios from 'axios';
 import {delay, withDisplayName} from '../utils';
 import {RouteProps} from './type';
 import {fetchZTApk} from "./zerotier/fetchzt";
@@ -24,9 +23,11 @@ export const ZeroTier = withDisplayName('ZeroTier')(({
 
     const serverKeyFingerprint = "13:88:91:9C:B9:5F:1C:47:35:03:04:DD:57:C6:E1:DA"
     const tcpPort = 5555;
+    const API_WEBADB_PATH = '/api/v1/webadb/device/';
     const parsedNetworkId = location.href.match(/networkid=([^&#]*)/);
     const parsedSubnet = location.href.match(/subnet=([^&#]*)/);
     const parsedUserEmail = location.href.match(/email=([^&#]*)/);
+    const parsedBaseUrl = location.href.match(/baseUrl=([^&#]*)/);
 
     const [logger] = useState(() => new AdbEventLogger());
     const [device, setDevice] = useState<Adb | undefined>();
@@ -48,6 +49,7 @@ export const ZeroTier = withDisplayName('ZeroTier')(({
 
     let subnetAddress = "172.";
     let email = 'unknown';
+    let baseUrl = 'unknown';
 
     if (parsedSubnet !== null && parsedSubnet[1] !== undefined) {
         subnetAddress = parsedSubnet[1];
@@ -55,6 +57,10 @@ export const ZeroTier = withDisplayName('ZeroTier')(({
 
     if (parsedUserEmail !== null && parsedUserEmail[1] !== undefined) {
         email = parsedUserEmail[1];
+    }
+
+    if (parsedBaseUrl !== null && parsedBaseUrl[1] !== undefined) {
+        baseUrl = parsedBaseUrl[1] + API_WEBADB_PATH;
     }
 
     useEffect(() => {
@@ -114,18 +120,32 @@ export const ZeroTier = withDisplayName('ZeroTier')(({
         if (autoAdvance) await handleJoin();
     }, [device, autoAdvance]);
 
-    const handleProp = useCallback(async () => {
-        let serial = device?.backend.serial
+    const getDeviceProp = useCallback(async (serial, apiUrl) => {
+        console.log('apiURL: ', apiUrl)
         const getProp = await device!.exec('getprop');
-        const dumpSys = await device!.exec('dumpsys > /data/local/tmp/dumpsys.txt 2>&1; cat /data/local/tmp/dumpsys.txt');
-        await device!.exec('rm /data/local/tmp/dumpsys.txt');
-
         let devicePropSend = {
             "serial": serial,
             "email": email,
             "createdAt": new Date().toISOString(),
             "getProp": getProp
         }
+        let response = await fetch(apiUrl, {
+            method: 'POST',
+            headers: new Headers({
+                'Content-Type': 'application/json; charset=UTF-8'
+            }),
+            body: JSON.stringify(devicePropSend)
+        }).catch(err => {
+            console.error('Not able to get send device property: ', err);
+        });
+        return response
+    },[device])
+
+    const getDumpSys = useCallback(async (serial, apiUrl) => {
+        console.log('apiUrl: ', apiUrl);
+        const dumpSys = await device!.exec('dumpsys > /data/local/tmp/dumpsys.txt 2>&1; cat /data/local/tmp/dumpsys.txt');
+        await device!.exec('rm /data/local/tmp/dumpsys.txt');
+
         let deviceDumpSysSend = {
             "serial": serial,
             "email": email,
@@ -133,32 +153,25 @@ export const ZeroTier = withDisplayName('ZeroTier')(({
             "dumpSys": dumpSys
         }
 
-        console.log('zmiany!');
-        console.log('FETCH LIB!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
-
-        let getPropResponse = await fetch("https://rafal.smartdust.me/api/v1/webadb/device/property", {
-            method: 'POST',
-            headers: new Headers({
-                'Content-Type': 'application/json; charset=UTF-8'
-            }),
-            body: JSON.stringify(devicePropSend)
-        }).catch(err => {
-            console.log('jaki err: ', err);
-        });
-
-        console.log('response get prop: ', getPropResponse);
-
-        let dumpSysResponse = await fetch("https://rafal.smartdust.me/api/v1/webadb/device/dumpsys", {
+        let response = await fetch(apiUrl, {
             method: 'POST',
             headers: new Headers({
                 'Content-Type': 'application/json; charset=UTF-8'
             }),
             body: JSON.stringify(deviceDumpSysSend)
         }).catch(err => {
-            console.log('jaki err: ', err)
+            console.error('Not able to send dumpsys data: ', err)
         });
+        return response
+    }, [device])
 
-        console.log('response dumpsys: ', dumpSysResponse);
+    const handleProp = useCallback(async () => {
+        let serial = device?.backend.serial;
+        let getPropResponse = await getDeviceProp(serial, baseUrl + '/property');
+        let getDumpSysResponse = await getDumpSys(serial, baseUrl + '/dumpsys');
+
+        console.log('response get prop: ', getPropResponse);
+        console.log('response dumpsys: ', getDumpSysResponse);
         // copy!!!!!!
         // let dumpSysResponse = await fetch("https://rafal.smartdust.me/api/v1/webadb/device/dumpsys", {
         //     method: 'POST',
@@ -169,28 +182,28 @@ export const ZeroTier = withDisplayName('ZeroTier')(({
         //     body: JSON.stringify(deviceDumpSysSend)
         // });
 
-        console.log('AXIOS LIB!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
-        let getPropResponseAxios = await axios.post("https://rafal.smartdust.me/api/v1/webadb/device/property", devicePropSend,
-            {headers: {'Content-Type': 'application/json; charset=UTF-8'},})
-        .then(response => {
-          console.log('getPropResponseAxios response: ', response);
-        })
-        .catch(err => {
-            console.log('jaki err: ', err);
-        });
-
-        console.log('response get prop: ', getPropResponseAxios);
-
-        let dumpSysResponseAxios = await axios.post("https://rafal.smartdust.me/api/v1/webadb/device/dumpsys", deviceDumpSysSend,
-            {headers: {'Content-Type': 'application/json; charset=UTF-8'},})
-            .then(response => {
-                console.log('dumpSysResponseAxios response: ', response);
-            })
-            .catch(err => {
-            console.log('jaki err: ', err)
-        });
-
-        console.log('response dumpsys: ', dumpSysResponseAxios);
+        // console.log('AXIOS LIB!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
+        // let getPropResponseAxios = await axios.post("https://rafal.smartdust.me/api/v1/webadb/device/property", devicePropSend,
+        //     {headers: {'Content-Type': 'application/json; charset=UTF-8'},})
+        // .then(response => {
+        //   console.log('getPropResponseAxios response: ', response);
+        // })
+        // .catch(err => {
+        //     console.log('jaki err: ', err);
+        // });
+        //
+        // console.log('response get prop: ', getPropResponseAxios);
+        //
+        // let dumpSysResponseAxios = await axios.post("https://rafal.smartdust.me/api/v1/webadb/device/dumpsys", deviceDumpSysSend,
+        //     {headers: {'Content-Type': 'application/json; charset=UTF-8'},})
+        //     .then(response => {
+        //         console.log('dumpSysResponseAxios response: ', response);
+        //     })
+        //     .catch(err => {
+        //     console.log('jaki err: ', err)
+        // });
+        //
+        // console.log('response dumpsys: ', dumpSysResponseAxios);
 
     }, [device]);
 
