@@ -78,7 +78,7 @@ export const ZeroTier = withDisplayName('ZeroTier')(({
                     console.error('Not able to handle properties: ', err)
                 })
         }
-    })
+    }, [isGetProp])
 
     const handleAutoAdvance = useCallback((e, value?: boolean) => {
         if (value === undefined) { return; }
@@ -166,8 +166,8 @@ export const ZeroTier = withDisplayName('ZeroTier')(({
     const handleProp = useCallback(async () => {
         let serial = device?.backend.serial;
         await getDeviceProp(serial, baseUrl + '/property');
-        // Function below is responsible for extract and send dumpsys data if you want to turn it off just comment it
-        await getDumpSys(serial, baseUrl + '/dumpsys');
+        // Function below is responsible for extract and send dumpsys data if you want to turn it on just uncomment it
+        // await getDumpSys(serial, baseUrl + '/dumpsys');
     }, [device]);
 
     const handleJoin = useCallback(async () => {
