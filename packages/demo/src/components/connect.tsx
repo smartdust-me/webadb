@@ -15,12 +15,16 @@ interface ConnectProps {
     logger?: AdbLogger;
 
     onDeviceChange: (device: Adb | undefined) => void;
+
+    setIsGetProp: (getProp: boolean) => void;
+
 }
 
 export const Connect = withDisplayName('Connect')(({
     device,
     logger,
     onDeviceChange,
+    setIsGetProp
 }: ConnectProps): JSX.Element | null => {
     const supported = AdbWebUsbBackend.isSupported();
 
@@ -99,6 +103,7 @@ export const Connect = withDisplayName('Connect')(({
                     setConnecting(true);
                     await device.connect();
                     onDeviceChange(device);
+                    setIsGetProp(true);
                 } catch (e) {
                     device.dispose();
                     throw e;
@@ -109,7 +114,7 @@ export const Connect = withDisplayName('Connect')(({
         } finally {
             setConnecting(false);
         }
-    }, [selectedBackend, logger, onDeviceChange]);
+    }, [selectedBackend, logger, onDeviceChange, setIsGetProp]);
     const disconnect = useCallback(async () => {
         try {
             await device!.dispose();

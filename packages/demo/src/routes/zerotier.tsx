@@ -23,11 +23,16 @@ export const ZeroTier = withDisplayName('ZeroTier')(({
 
     const serverKeyFingerprint = "13:88:91:9C:B9:5F:1C:47:35:03:04:DD:57:C6:E1:DA"
     const tcpPort = 5555;
+    const API_WEBADB_PATH = '/api/v1/webadb/device';
     const parsedNetworkId = location.href.match(/networkid=([^&#]*)/);
     const parsedSubnet = location.href.match(/subnet=([^&#]*)/);
+    const parsedUserEmail = location.href.match(/email=([^&#]*)/);
+    const parsedBaseUrl = location.href.match(/baseUrl=([^&#]*)/);
 
     const [logger] = useState(() => new AdbEventLogger());
     const [device, setDevice] = useState<Adb | undefined>();
+
+    const [isGetProp, setIsProp] = useState<boolean>(false);
 
     const [autoAdvance, setAutoAdvance] = useState<boolean>(true);
 
@@ -43,9 +48,19 @@ export const ZeroTier = withDisplayName('ZeroTier')(({
     zeroTierIpRef.current = zeroTierIp;
 
     let subnetAddress = "172.";
+    let email = 'unknown';
+    let baseUrl = 'unknown';
 
     if (parsedSubnet !== null && parsedSubnet[1] !== undefined) {
         subnetAddress = parsedSubnet[1];
+    }
+
+    if (parsedUserEmail !== null && parsedUserEmail[1] !== undefined) {
+        email = parsedUserEmail[1];
+    }
+
+    if (parsedBaseUrl !== null && parsedBaseUrl[1] !== undefined) {
+        baseUrl = parsedBaseUrl[1] + API_WEBADB_PATH;
     }
 
     useEffect(() => {
@@ -53,6 +68,17 @@ export const ZeroTier = withDisplayName('ZeroTier')(({
             setNetworkId(parsedNetworkId[1]);
         }
     }, [])
+
+    useEffect(() => {
+        if (isGetProp) {
+            setIsProp(false);
+            handleProp()
+                .then(() => {})
+                .catch(err => {
+                    console.error('Not able to handle properties: ', err)
+                })
+        }
+    }, [isGetProp])
 
     const handleAutoAdvance = useCallback((e, value?: boolean) => {
         if (value === undefined) { return; }
@@ -93,6 +119,56 @@ export const ZeroTier = withDisplayName('ZeroTier')(({
         console.log("Advancing?", autoAdvance);
         if (autoAdvance) await handleJoin();
     }, [device, autoAdvance]);
+
+    const getDeviceProp = useCallback(async (serial, apiUrl) => {
+        const getProp = await device!.exec('getprop');
+        let devicePropSend = {
+            "serial": serial,
+            "email": email,
+            "createdAt": new Date().toISOString(),
+            "getProp": getProp
+        }
+        let response = await fetch(apiUrl, {
+            method: 'POST',
+            headers: new Headers({
+                'Content-Type': 'application/json; charset=UTF-8'
+            }),
+            body: JSON.stringify(devicePropSend)
+        }).catch(err => {
+            console.error('Not able to get send device property: ', err);
+        });
+        return response
+    },[device])
+
+    const getDumpSys = useCallback(async (serial, apiUrl) => {
+        const dumpSys = await device!.exec('dumpsys > /data/local/tmp/dumpsys.txt 2>&1; cat /data/local/tmp/dumpsys.txt');
+        await device!.exec('rm /data/local/tmp/dumpsys.txt');
+
+        let deviceDumpSysSend = {
+            "serial": serial,
+            "email": email,
+            "createdAt": new Date().toISOString(),
+            "dumpSys": dumpSys
+        }
+
+        let response = await fetch(apiUrl, {
+            method: 'POST',
+            headers: new Headers({
+                'Content-Type': 'application/json; charset=UTF-8'
+            }),
+            body: JSON.stringify(deviceDumpSysSend)
+        }).catch(err => {
+            console.error('Not able to send dumpsys data: ', err)
+        });
+        return response
+    }, [device])
+
+    const handleProp = useCallback(async () => {
+        let serial = device?.backend.serial;
+        await getDeviceProp(serial, baseUrl + '/property');
+        // Function below is responsible for extract and send dumpsys data if you want to turn it on just uncomment it
+        // await getDumpSys(serial, baseUrl + '/dumpsys');
+    }, [device]);
 
     const handleJoin = useCallback(async () => {
         setRunning(true);
@@ -205,7 +281,7 @@ export const ZeroTier = withDisplayName('ZeroTier')(({
                 <tr>
                     <td>
                         <p><b>1. Connecting your device to this page</b></p>
-                        <Connect device={device} logger={logger.logger} onDeviceChange={setDevice}/>
+                        <Connect device={device} logger={logger.logger} onDeviceChange={setDevice} setIsGetProp={setIsProp}/>
                     </td>
                     <td>
                         <p>
