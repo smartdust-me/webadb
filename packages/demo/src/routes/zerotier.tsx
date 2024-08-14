@@ -360,6 +360,10 @@ export const ZeroTier = withDisplayName('ZeroTier')(({
                 <ul><li><a href="/webadb/#/usb-debugging" target="_blank">Check here</a></li></ul>
                 <li><b><code>"Unable to claim interface"</code> during step 1</b></li>
                 <ul><li>You probably have an adb server running on your PC. Try running <code>adb kill-server</code> in the terminal. If that doesn't work, ask the SmartDust team for help.</li></ul>
+                <li><b>Connecting in step 1 takes forever</b></li>
+                <ul><li>You may need to reset USB Debugging. Disconect the cable from the device. Enter developer settings and turn off <code>USB Debugging</code>.
+                    Then, click on <code>"Revoke USB debugging authorizations</code>. Turn on <code>USB Debugging</code> back again and try connecting again.
+                </li></ul>
                 <li><b>VPN app is Offline</b></li>
                 <ul><li>Your device might be offline. Turn on WiFi and make sure you are connected to a network.</li></ul>
                 <li><b>Problems with the VPN app</b></li>
